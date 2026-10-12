@@ -1,0 +1,30 @@
+# secrets and local config
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*_key
+ssh_host_*
+id_ed25519*
+id_rsa*
+data/
+
+# go
+/bin/
+/dist/
+*.test
+*.out
+coverage.out
+
+# node
+node_modules/
+web/build/
+web/.svelte-kit/
+.pnpm-store/
+
+# editors and OS
+.DS_Store
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,12 @@
+pre-commit:
+  parallel: true
+  commands:
+    gitleaks:
+      run: gitleaks protect --staged --config .gitleaks.toml --redact --no-banner
+    gofmt:
+      glob: "*.go"
+      run: test -z "$(gofmt -l {staged_files})" || (gofmt -l {staged_files}; exit 1)
+    prettier:
+      glob: "web/**/*.{ts,js,svelte,css,json,md}"
+      root: web/
+      run: test ! -d node_modules || pnpm exec prettier --check {staged_files}

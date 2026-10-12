@@ -1,0 +1,14 @@
+title = "planning-poker gitleaks config"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "personal-email"
+description = "Personal email address (use the GitHub noreply address)"
+regex = '''(?i)[a-z0-9._%+-]+@(gmail|googlemail|outlook|hotmail|icloud|yahoo|gmx|web|proton|protonmail)\.(com|de|me)'''
+
+[allowlist]
+paths = [
+  '''\.env\.example$''',
+]

@@ -1,0 +1,6 @@
+# Protected paths: maintainer review required
+/.github/ @reh2ur
+/deploy/ @reh2ur
+/.gitleaks.toml @reh2ur
+/lefthook.yml @reh2ur
+/CLAUDE.md @reh2ur
