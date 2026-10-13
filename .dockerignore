@@ -1,0 +1,17 @@
+.git
+.github
+.env*
+*.pem
+*.key
+*_key
+ssh_host_*
+id_ed25519*
+id_rsa*
+data/
+bin/
+coverage.out
+**/node_modules
+web/build
+web/.svelte-kit
+internal/web/dist/*
+!internal/web/dist/.gitkeep
