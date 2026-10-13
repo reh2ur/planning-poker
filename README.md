@@ -16,6 +16,8 @@ make dev-web      # terminal 2
 make lint test
 ```
 
+Dev loop: run `make dev-server` and `make dev-web` in two terminals and open the Vite URL (http://localhost:5173). Vite hot-reloads the web app and proxies `/ws` and `/healthz` to the Go server. The proxy target is derived from `POKER_HTTP_ADDR` (default `localhost:8080`), so export it in both terminals to use another port.
+
 ## License
 
 MIT

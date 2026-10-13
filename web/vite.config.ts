@@ -1,9 +1,14 @@
 import tailwindcss from '@tailwindcss/vite';
+import { loadEnv } from 'vite';
 import { defineConfig } from 'vitest/config';
 import adapter from '@sveltejs/adapter-static';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { devProxy } from './src/lib/devProxy.ts';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+	server: {
+		proxy: devProxy(loadEnv(mode, '.', 'POKER_'))
+	},
 	plugins: [
 		tailwindcss(),
 		sveltekit({
@@ -29,4 +34,4 @@ export default defineConfig({
 			}
 		]
 	}
-});
+}));
