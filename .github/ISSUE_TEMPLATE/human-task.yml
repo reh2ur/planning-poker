@@ -1,0 +1,56 @@
+name: Human task
+description: Work only the maintainer can do (infra, accounts, repo settings, company-network checks)
+labels: ["owner:human", "type:chore"]
+body:
+  - type: input
+    id: spec
+    attributes:
+      label: Spec link
+      description: Link to the relevant docs/SPEC.md section.
+      placeholder: https://github.com/reh2ur/planning-poker/blob/main/docs/SPEC.md#architecture
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why this needs a human. Agents skip issues labeled owner:human.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Steps for the maintainer. Agents may prepare checklists or wizard scripts but never run them. Do not record employer hostnames or corporate-network details.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: One checkbox per verifiable outcome.
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What this issue deliberately does not cover.
+    validations:
+      required: false
+  - type: textarea
+    id: test-notes
+    attributes:
+      label: Test notes
+      description: How to verify the result.
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: No secrets or personal data in this issue, its code, fixtures, logs or comments (see CLAUDE.md).
+          required: true
