@@ -20,6 +20,8 @@ coverage.out
 # node
 node_modules/
 web/build/
+/internal/web/dist/*
+!/internal/web/dist/.gitkeep
 web/.svelte-kit/
 .pnpm-store/
 

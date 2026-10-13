@@ -29,7 +29,9 @@ lint-web:
 build: build-web build-go
 
 build-web:
-	cd web && pnpm build
+	cd web && pnpm install --frozen-lockfile && pnpm build
+	find internal/web/dist -mindepth 1 ! -name .gitkeep -delete
+	cp -R web/build/. internal/web/dist/
 
 build-go:
 	go build -o bin/poker ./cmd/poker
