@@ -17,5 +17,5 @@ RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/poker ./cmd/poker
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=server /out/poker /poker
 USER nonroot:nonroot
-EXPOSE 8080 2222
+EXPOSE 8080
 ENTRYPOINT ["/poker"]

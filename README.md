@@ -25,7 +25,7 @@ cp .env.example .env
 docker compose -f deploy/docker-compose.yml up --build
 ```
 
-Serves the web app on http://localhost:8080. All configuration comes from `.env`; the image contains no env or key files.
+Serves the web app on http://localhost:8080. Configuration comes from `.env`; the published port in `deploy/docker-compose.yml` assumes the default `POKER_HTTP_ADDR`. The image contains no env or key files.
 
 ## License
 
