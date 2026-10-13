@@ -1,0 +1,57 @@
+name: Spike
+description: A time-boxed investigation that ends in a decision
+labels: ["type:spike"]
+body:
+  - type: input
+    id: spec
+    attributes:
+      label: Spec link
+      description: Link to the docs/SPEC.md section this spike validates.
+      placeholder: https://github.com/reh2ur/planning-poker/blob/main/docs/SPEC.md#risks-validation-and-open-items
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: The question to answer and why it matters.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What to try, and the time box.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: One checkbox per verifiable outcome, ending with the conclusion.
+      value: |
+        - [ ]
+        - [ ] Conclusion recorded in this issue or an ADR
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What this spike deliberately does not cover.
+    validations:
+      required: false
+  - type: textarea
+    id: test-notes
+    attributes:
+      label: Test notes
+      description: How results are recorded and checked.
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy
+      options:
+        - label: No secrets or personal data in this issue, its code, fixtures, logs or comments (see CLAUDE.md).
+          required: true
