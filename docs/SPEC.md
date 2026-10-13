@@ -171,7 +171,7 @@ Deploy: GitHub Actions → GHCR image → VM over Tailscale SSH.
 **Components**
 
 - **Room hub:** in-memory map of room ID to room state. Server-authoritative while running; first write wins (two people setting up the same empty room at once).
-- **Web:** SvelteKit built as static files, embedded with `go:embed`, Tailwind for styling. WebSocket for live state, with heartbeats and auto-reconnect.
+- **Web:** SvelteKit built as static files, embedded with `go:embed` (`make build` copies `web/build` into `internal/web/dist`; only a `.gitkeep` is tracked, so Go builds without a web build and then answers 503 for the app shell). Unknown paths without a file extension get `index.html` (room URLs); unknown asset paths get 404. Tailwind for styling. WebSocket for live state, with heartbeats and auto-reconnect.
 - **SSH:** Charm's Wish, Bubble Tea and Lip Gloss. Each session is a participant object in a room, like a WebSocket connection. Username = display name; the command argument = room ID; no PTY = line mode.
 - **Caddy** in front for automatic HTTPS. Optional sslh to multiplex SSH and HTTPS on port 443 if port 22 is blocked.
 
