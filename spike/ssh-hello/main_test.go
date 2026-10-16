@@ -3,6 +3,8 @@ package main
 import (
 	"bytes"
 	"io"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -124,5 +126,15 @@ func TestEphemeralHostKeyIsUnique(t *testing.T) {
 	}
 	if bytes.Equal(a, b) {
 		t.Fatal("ephemeral keys must differ")
+	}
+}
+
+func TestServerGeneratesMissingHostKeyAtConfiguredPath(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "host_key")
+	if _, err := newServer("127.0.0.1:0", path); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(path); err != nil {
+		t.Fatalf("host key not written at configured path: %v", err)
 	}
 }
