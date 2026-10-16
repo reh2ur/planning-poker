@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WebSocket idle test</title>
+    <style>
+      body { font: 15px/1.5 system-ui, sans-serif; max-width: 42rem; margin: 2rem auto; padding: 0 1rem; }
+      dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; }
+      dt { font-weight: 600; }
+      dd { margin: 0; }
+      #state { font-weight: 700; }
+      #state.open { color: #0a7a2f; }
+      #state.closed { color: #b00020; }
+      pre { background: #f2f2f2; padding: 0.75rem; max-height: 20rem; overflow: auto; }
+      input { width: 5rem; }
+    </style>
+  </head>
+  <body>
+    <h1>WebSocket idle test</h1>
+    <p>
+      Leave this page open. The heartbeat sends a message every <em>interval</em> seconds and expects it echoed.
+      A missed echo or close counts as a drop and triggers a reconnect.
+    </p>
+    <form id="form">
+      <label>Heartbeat interval (seconds) <input id="interval" type="number" min="1" value="30" /></label>
+      <button>Apply</button>
+    </form>
+    <dl>
+      <dt>State</dt><dd id="state" class="closed">connecting</dd>
+      <dt>Connected for</dt><dd id="uptime">-</dd>
+      <dt>Reconnects</dt><dd id="reconnects">0</dd>
+      <dt>Last round trip</dt><dd id="rtt">-</dd>
+      <dt>Heartbeats echoed</dt><dd id="beats">0</dd>
+    </dl>
+    <h2>Log</h2>
+    <pre id="log"></pre>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const params = new URLSearchParams(location.search);
+      const RECONNECT_DELAY_MS = 1000;
+
+      let intervalSec = Math.max(1, Number(params.get('interval')) || 30);
+      let ws = null;
+      let beatTimer = null;
+      let awaiting = false;
+      let openedAt = 0;
+      let reconnects = 0;
+      let beats = 0;
+      let everOpened = false;
+
+      $('interval').value = intervalSec;
+
+      function log(msg) {
+        $('log').textContent = new Date().toISOString() + '  ' + msg + '\n' + $('log').textContent;
+      }
+
+      function setState(name) {
+        $('state').textContent = name;
+        $('state').className = name === 'open' ? 'open' : 'closed';
+      }
+
+      function fmt(ms) {
+        const s = Math.floor(ms / 1000);
+        return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m ${s % 60}s`;
+      }
+
+      function connect() {
+        setState('connecting');
+        const sock = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
+        ws = sock;
+        sock.onopen = () => {
+          if (sock !== ws) return;
+          openedAt = Date.now();
+          if (everOpened) {
+            reconnects++;
+            $('reconnects').textContent = reconnects;
+          }
+          everOpened = true;
+          setState('open');
+          log('open');
+          startHeartbeat(sock);
+        };
+        sock.onmessage = (ev) => {
+          if (sock !== ws) return;
+          const sent = Number(String(ev.data).split(' ')[1]);
+          $('rtt').textContent = Date.now() - sent + ' ms';
+          $('beats').textContent = ++beats;
+          awaiting = false;
+        };
+        sock.onerror = () => {
+          if (sock === ws) log('socket error');
+        };
+        sock.onclose = (ev) => drop(sock, `closed code=${ev.code}`);
+      }
+
+      // Also used when the heartbeat goes unanswered: a half-open socket may take
+      // minutes to report close, so detach it and reconnect right away.
+      function drop(sock, reason) {
+        if (sock !== ws) return;
+        ws = null;
+        sock.onopen = sock.onmessage = sock.onerror = sock.onclose = null;
+        try {
+          sock.close();
+        } catch {}
+        const lived = openedAt ? fmt(Date.now() - openedAt) : 'never opened';
+        log(`${reason} after ${lived}; reconnecting in ${RECONNECT_DELAY_MS} ms`);
+        stopHeartbeat();
+        openedAt = 0;
+        setState('closed');
+        setTimeout(connect, RECONNECT_DELAY_MS);
+      }
+
+      // A tick finding the previous ping still unanswered means the connection
+      // is dead even though no close event arrived.
+      function startHeartbeat(sock) {
+        stopHeartbeat();
+        beatTimer = setInterval(() => {
+          if (awaiting) {
+            drop(sock, `no echo within ${intervalSec} s`);
+            return;
+          }
+          if (sock.readyState !== WebSocket.OPEN) return;
+          awaiting = true;
+          sock.send('ping ' + Date.now());
+        }, intervalSec * 1000);
+      }
+
+      function stopHeartbeat() {
+        clearInterval(beatTimer);
+        awaiting = false;
+      }
+
+      $('form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        intervalSec = Math.max(1, Number($('interval').value) || 30);
+        log(`heartbeat interval set to ${intervalSec} s`);
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          const wasAwaiting = awaiting;
+          startHeartbeat(ws);
+          awaiting = wasAwaiting;
+        }
+      });
+
+      setInterval(() => {
+        $('uptime').textContent = openedAt ? fmt(Date.now() - openedAt) : '-';
+      }, 1000);
+
+      connect();
+    </script>
+  </body>
+</html>
