@@ -20,6 +20,7 @@
 
 	$effect(() => {
 		document.documentElement.classList.toggle('dark', dark);
+		return () => document.documentElement.classList.remove('dark');
 	});
 </script>
 
